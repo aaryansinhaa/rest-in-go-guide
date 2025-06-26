@@ -36,7 +36,7 @@ func LocalServer(cfg *config.Config) {
 
 		err := server.ListenAndServe()
 
-		if err != nil {
+		if err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Failed to start server: %v", err)
 		}
 
