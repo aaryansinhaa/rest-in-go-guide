@@ -22,7 +22,7 @@ func MustLoadConfig() *Config {
 	var configPath string
 	configPath = os.Getenv("MIYUKI_CONFIG_PATH")
 	if configPath == "" {
-		flags := flag.String("config", "config/local.yaml", "Path to the configuration file")
+		flags := flag.String("config", "config/prod.yaml", "Path to the configuration file")
 		flag.Parse()
 		configPath = *flags
 
