@@ -12,15 +12,13 @@ import (
 	"time"
 
 	"github.com/aaryansinhaa/miyuki/pkg/config"
+	"github.com/aaryansinhaa/miyuki/pkg/server/api"
 )
 
 func LocalServer(cfg *config.Config) {
 
 	// Setup routes
-	router := http.NewServeMux()
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to Miyuki! Running in %s environment", cfg.Env)
-	})
+	router := api.SetupRouter()
 
 	server := http.Server{
 		Addr:    cfg.HTTPServerConfig.Address,
