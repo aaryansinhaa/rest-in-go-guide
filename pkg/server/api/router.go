@@ -19,5 +19,8 @@ func SetupRouter(storage storage.Storage) *http.ServeMux {
 	//POST /api/block/new
 	router.HandleFunc("POST /api/block/new", handlers.CreateBlock(storage))
 
+	//GET /api/block/{id}
+	router.HandleFunc("GET /api/block/{id}", handlers.GetBlock(storage))
+
 	return router
 }

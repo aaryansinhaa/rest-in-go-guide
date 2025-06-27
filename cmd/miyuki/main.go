@@ -15,7 +15,7 @@ func main() {
 	cfg := config.MustLoadConfig()
 	fmt.Printf("Loaded configuration: %+v\n", cfg)
 	//Setup the database connection
-	storage, err := sqlite.NewSQLiteStorage(cfg)
+	storage, err := sqlite.LoadSQLiteStorage(cfg)
 	if err != nil {
 		log.Fatal("Failed to initialize storage:", err)
 	}

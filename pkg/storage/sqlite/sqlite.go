@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/aaryansinhaa/miyuki/pkg/config"
+	"github.com/aaryansinhaa/miyuki/pkg/types"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -12,7 +13,7 @@ type SQLiteStorage struct {
 	DB *sql.DB
 }
 
-func NewSQLiteStorage(cfg *config.Config) (*SQLiteStorage, error) {
+func LoadSQLiteStorage(cfg *config.Config) (*SQLiteStorage, error) {
 	storage, err := sql.Open("sqlite3", cfg.StoragePath)
 	if err != nil {
 		return nil, err
@@ -32,7 +33,7 @@ func NewSQLiteStorage(cfg *config.Config) (*SQLiteStorage, error) {
 
 }
 
-func (s *SQLiteStorage) CreateBlock(name string, age int, address string, email string) (int64, error) {
+func (s *SQLiteStorage) CreateBlockInStorage(m types.Miyuki) (int64, error) {
 	//we used s.DB.Prepare instead of s.DB.Exec to prepare the statement
 	// to avoid SQL injection attacks and to improve performance
 	//we can use s.DB.Exec if we are not using the prepared statement
@@ -44,7 +45,7 @@ func (s *SQLiteStorage) CreateBlock(name string, age int, address string, email 
 		return 0, err
 	}
 	defer result.Close()
-	res, err := result.Exec(name, age, address, email)
+	res, err := result.Exec(m.Name, m.Age, m.Address, m.Address)
 	if err != nil {
 		return 0, err
 	}
@@ -54,4 +55,18 @@ func (s *SQLiteStorage) CreateBlock(name string, age int, address string, email 
 	}
 	fmt.Printf("Block created with ID: %d\n", id)
 	return id, nil
+}
+func (s *SQLiteStorage) GetBlockByID(id int64) (*types.Miyuki, error) {
+	query := "SELECT id, name, age, address, email FROM blocks WHERE id = ?"
+	row := s.DB.QueryRow(query, id)
+
+	var m types.Miyuki
+	err := row.Scan(&m.Id, &m.Name, &m.Age, &m.Address, &m.Email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("block with ID %d not found", id)
+		}
+		return nil, err
+	}
+	return &m, nil
 }

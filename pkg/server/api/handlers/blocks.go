@@ -36,7 +36,7 @@ func CreateBlock(storage storage.Storage) http.HandlerFunc {
 			return
 		}
 		// Save the Miyuki struct to the storage
-		id, err := storage.CreateBlock(miyuki.Name, miyuki.Age, miyuki.Address, miyuki.Email)
+		id, err := storage.CreateBlockInStorage(miyuki)
 		if err != nil {
 			slog.Error("Failed to create block", "error", err)
 			response.ErrorResponseWriter(w, http.StatusInternalServerError, "Failed to create block: "+err.Error())
@@ -50,7 +50,37 @@ func CreateBlock(storage storage.Storage) http.HandlerFunc {
 }
 
 // Handlers for block operations
-func GetBlock()    {}
-func UpdateBlock() {}
-func DeleteBlock() {}
-func ListBlocks()  {}
+func GetBlock(storage storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.PathValue("id")
+		if id == "" {
+			response.ErrorResponseWriter(w, http.StatusBadRequest, "Block ID is required")
+			return
+		}
+		blockID, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			response.ErrorResponseWriter(w, http.StatusBadRequest, "Invalid block ID format")
+			return
+		}
+		block, err := storage.GetBlockByID(blockID)
+		if err != nil {
+
+			slog.Error("Block not found", "id", blockID)
+			response.ErrorResponseWriter(w, http.StatusNotFound, "Block not found")
+			return
+		}
+		slog.Error("Failed to retrieve block", "error", err)
+
+		err = json.NewEncoder(w).Encode(block)
+		if err != nil {
+			slog.Error("Failed to encode block", "error", err)
+			response.ErrorResponseWriter(w, http.StatusInternalServerError, "Failed to encode block: "+err.Error())
+			return
+		}
+		slog.Info("Block retrieved successfully", slog.Int64("id", blockID))
+	}
+}
+
+// func UpdateBlock() {}
+// func DeleteBlock() {}
+// func ListBlocks()  {}
