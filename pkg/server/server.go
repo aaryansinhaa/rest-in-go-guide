@@ -13,12 +13,13 @@ import (
 
 	"github.com/aaryansinhaa/miyuki/pkg/config"
 	"github.com/aaryansinhaa/miyuki/pkg/server/api"
+	"github.com/aaryansinhaa/miyuki/pkg/storage"
 )
 
-func LocalServer(cfg *config.Config) {
+func LocalServer(cfg *config.Config, storage storage.Storage) {
 
 	// Setup routes
-	router := api.SetupRouter()
+	router := api.SetupRouter(storage)
 
 	server := http.Server{
 		Addr:    cfg.HTTPServerConfig.Address,
